@@ -48,8 +48,8 @@ class UserController @Inject()(repo: UserRepository,
   }
 
   def getUser(id: Long) = Action.async { implicit request =>
-    repo.list().map { users =>
-      Ok(Json.toJson(users.filter(_.id == id)))
+    repo.find(id).map { users =>
+      Ok(Json.toJson(users(0)))
     }
   }
 
@@ -61,12 +61,10 @@ class UserController @Inject()(repo: UserRepository,
   }
 
   // updates a user with `id` == id
-  def updateUser(id: Long, username: String, password: String) = Action { implicit request =>
-    Ok("updated")
-    /*
+  def updateUser(id: Long, username: String, password: String) = Action.async { implicit request =>
     repo.update(id, username, password).map { _ => 
       Ok("updated user with id = " + id)
-    }*/
+    }
   }
 
   // returns a list of all usernames
