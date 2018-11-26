@@ -12,6 +12,8 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
+case class CreateUserForm(username: String, password: String)
+
 class UserController @Inject()(repo: UserRepository,
                                   cc: MessagesControllerComponents
                                 )(implicit ec: ExecutionContext)
@@ -40,8 +42,14 @@ class UserController @Inject()(repo: UserRepository,
 
   // returns list of all users
   def getUsers = Action.async { implicit request =>
-    repo.list().map { people =>
-      Ok(Json.toJson(people))
+    repo.list().map { users =>
+      Ok(Json.toJson(users))
+    }
+  }
+
+  def getUser(id: Long) = Action.async { implicit request =>
+    repo.list().map { users =>
+      Ok(Json.toJson(users.filter(_.id == id)))
     }
   }
 
@@ -52,12 +60,16 @@ class UserController @Inject()(repo: UserRepository,
     }
   }
 
-  def updateUser(id: Long, username: String, password: String) = Action.async { implicit request => 
+  // updates a user with `id` == id
+  def updateUser(id: Long, username: String, password: String) = Action { implicit request =>
+    Ok("updated")
+    /*
     repo.update(id, username, password).map { _ => 
       Ok("updated user with id = " + id)
-    }
+    }*/
   }
 
+  // returns a list of all usernames
   def getUsernames = Action.async { implicit request => 
     repo.usernames().map { usernames => 
       Ok(Json.toJson(usernames))
@@ -65,12 +77,3 @@ class UserController @Inject()(repo: UserRepository,
   }
 
 }
-
-/**
- * The create person form.
- *
- * Generally for forms, you should define separate objects to your models, since forms very often need to present data
- * in a different way to your models.  In this case, it doesn't make sense to have an id parameter in the form, since
- * that is generated once it's created.
- */
-case class CreateUserForm(username: String, password: String)

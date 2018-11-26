@@ -8,6 +8,7 @@ POST    /user/delete                controllers.UserController.deleteUser(id: Lo
 POST    /user/update                controllers.UserController.updateUser(id: Long, username: String, password: String)
 
 GET     /users                      controllers.UserController.getUsers
+GET     /users/:id                  controllers.UserController.getUser(id: Long)
 
 GET     /usernames                  controllers.UserController.getUsernames
 

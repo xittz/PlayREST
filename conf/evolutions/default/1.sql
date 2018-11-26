@@ -6,11 +6,6 @@ create table "users" (
   "password" varchar not null
 );
 
-insert into "users" values (1, "xittz", "1233ds");
-insert into "users" values (2, "admin", "asddsa13ds");
-insert into "users" values (3, "kostya77", "apple808s");
-insert into "users" values (4, "iwbbtt", "dasdass");
-
 # --- !Downs
 
 drop table "users" if exists;
