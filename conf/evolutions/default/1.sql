@@ -7,9 +7,9 @@ create table "users" (
 );
 
 insert into "users" values (1, "xittz", "1233ds");
-insert into "users" values (1, "admin", "asddsa13ds");
-insert into "users" values (1, "kostya77", "apple808s");
-insert into "users" values (1, "iwbbtt", "dasdass");
+insert into "users" values (2, "admin", "asddsa13ds");
+insert into "users" values (3, "kostya77", "apple808s");
+insert into "users" values (4, "iwbbtt", "dasdass");
 
 # --- !Downs
 
