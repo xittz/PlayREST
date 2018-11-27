@@ -6,6 +6,9 @@ create table "users" (
   "password" varchar not null
 );
 
+insert into "users" ("username", "password") values ('xittz', '1234');
+insert into "users" ("username", "password") values ('admin', 'weqweq');
+
 # --- !Downs
 
 drop table "users" if exists;

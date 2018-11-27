@@ -40,6 +40,10 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     users.result
   }
 
+  def exists(id: Long): Future[Boolean] = db.run {
+    users.filter(_.id === id).exists.result
+  }
+
   // finds user with `id` == id
   def find(id: Long): Future[Seq[User]] = db.run {
     users.filter(_.id === id).result
@@ -57,7 +61,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   }
 
   def usernames(): Future[Seq[String]] = db.run {
-    users.map(user => user.username).result
+    users.map(_.username).result
   }
 
 

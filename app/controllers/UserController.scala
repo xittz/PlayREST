@@ -26,21 +26,48 @@ class UserController @Inject()(repo: UserRepository,
     )(CreateUserForm.apply)(CreateUserForm.unapply)
   }
 
-  // adds a new user
   def addUser = Action.async { implicit request =>
     userForm.bindFromRequest.fold(
       errorForm => {
-        Future.successful(Ok("Wasn't able to create a new user"))
+        Future.successful(BadRequest("new user wasn't created"))
       },
       user => {
         repo.create(user.username, user.password).map { _ =>
-          Ok("User " + user.username + " is created")
+          Created("User " + user.username + " is created")
         }
       }
     )
   }
 
-  // returns list of all users
+  def updateUser(id: Long) = Action.async { implicit request =>
+    userForm.bindFromRequest.fold(
+      errorForm => {
+        Future.successful(BadRequest("user wasn't updated"))
+      },
+      user => {
+        repo.exists(id).map { exists =>
+          if (exists) {
+            repo.update(id, user.username, user.password)
+            Ok("updated user with id = " + id)
+          } else {
+            NotFound("user with id = " + id + " is not found")
+          }
+        }
+      }
+    )
+  }
+
+  def deleteUser(id: Long) = Action.async { implicit request =>
+    repo.exists(id).map { exists => 
+      if (exists) {
+        repo.delete(id)
+        Ok("user with id = " + id + " is deleted")
+      } else {
+        NotFound("user with id = " + id + " is not found")
+      }
+    }
+  }
+
   def getUsers = Action.async { implicit request =>
     repo.list().map { users =>
       Ok(Json.toJson(users))
@@ -53,21 +80,6 @@ class UserController @Inject()(repo: UserRepository,
     }
   }
 
-  // deletes a user with `id` == id
-  def deleteUser(id: Long) = Action.async { implicit request => 
-    repo.delete(id).map { _ => 
-      Ok("deleted user with id = " + id)
-    }
-  }
-
-  // updates a user with `id` == id
-  def updateUser(id: Long, username: String, password: String) = Action.async { implicit request =>
-    repo.update(id, username, password).map { _ => 
-      Ok("updated user with id = " + id)
-    }
-  }
-
-  // returns a list of all usernames
   def getUsernames = Action.async { implicit request => 
     repo.usernames().map { usernames => 
       Ok(Json.toJson(usernames))

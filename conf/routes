@@ -2,13 +2,12 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-
-POST    /user                       controllers.UserController.addUser
-POST    /user/delete                controllers.UserController.deleteUser(id: Long)
-POST    /user/update                controllers.UserController.updateUser(id: Long, username: String, password: String)
-
 GET     /users                      controllers.UserController.getUsers
 GET     /users/:id                  controllers.UserController.getUser(id: Long)
+
+POST    /user                       controllers.UserController.addUser
+PUT     /user                       controllers.UserController.updateUser(id: Long)
+DELETE  /user                       controllers.UserController.deleteUser(id: Long)
 
 GET     /usernames                  controllers.UserController.getUsernames
 
