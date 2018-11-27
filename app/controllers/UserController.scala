@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 
 import models._
+import dao._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -29,7 +30,7 @@ class UserController @Inject()(repo: UserRepository,
   def addUser = Action.async { implicit request =>
     userForm.bindFromRequest.fold(
       errorForm => {
-        Future.successful(BadRequest("new user wasn't created"))
+        Future.successful(BadRequest("error parsing body"))
       },
       user => {
         repo.create(user.username, user.password).map { _ =>
@@ -42,7 +43,7 @@ class UserController @Inject()(repo: UserRepository,
   def updateUser(id: Long) = Action.async { implicit request =>
     userForm.bindFromRequest.fold(
       errorForm => {
-        Future.successful(BadRequest("user wasn't updated"))
+        Future.successful(BadRequest("error parsing body"))
       },
       user => {
         repo.exists(id).map { exists =>
