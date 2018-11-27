@@ -49,33 +49,4 @@ class UserJsonController @Inject()(repo: UserRepository,
       }
     )
   }
-
-  def deleteUser(id: Long) = Action.async { implicit request =>
-    repo.exists(id).map { exists => 
-      if (exists) {
-        repo.delete(id)
-        Ok("user with id = " + id + " is deleted")
-      } else {
-        NotFound("user with id = " + id + " is not found")
-      }
-    }
-  }
-
-  def getUsers = Action.async { implicit request =>
-    repo.list().map { users =>
-      Ok(Json.toJson(users))
-    }
-  }
-
-  def getUser(id: Long) = Action.async { implicit request =>
-    repo.find(id).map { users =>
-      Ok(Json.toJson(users))
-    }
-  }
-
-  def getUsernames = Action.async { implicit request => 
-    repo.usernames().map { usernames => 
-      Ok(Json.toJson(usernames))
-    }
-  }
 }
