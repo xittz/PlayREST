@@ -8,3 +8,6 @@ DELETE  /user                       controllers.UserController.deleteUser(id: Lo
 GET     /usernames                  controllers.UserController.getUsernames
 
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+POST    /json/user                  controllers.UserJsonController.addUser
+PUT     /json/user                  controllers.UserJsonController.updateUser(id: Long)

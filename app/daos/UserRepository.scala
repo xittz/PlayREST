@@ -4,6 +4,8 @@ import models._
 import javax.inject.{ Inject, Singleton }
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 import scala.concurrent.{ Future, ExecutionContext }
 
@@ -14,25 +16,30 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   import dbConfig._
   import profile.api._
+  
+  case class UserInfo(id: Long, username: String, password: String)
+  object UserInfo {
+    implicit val userInfoFormat = Json.format[UserInfo]
+  }
 
-  private class UserTable(tag: Tag) extends Table[User](tag, "users") {
+  private class UserTable(tag: Tag) extends Table[UserInfo](tag, "users") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def username = column[String]("username")
     def password = column[String]("password")
 
-    def * = (id, username, password) <> ((User.apply _).tupled, User.unapply)
+    def * = (id, username, password) <> ((UserInfo.apply _).tupled, UserInfo.unapply)
   }
 
   private val users = TableQuery[UserTable]
  
-  def create(username: String, password: String): Future[User] = db.run {
+  def create(username: String, password: String): Future[UserInfo] = db.run {
     (users.map(u => (u.username, u.password))
       returning users.map(_.id)
-      into ((userInfo, id) => User(id, userInfo._1, userInfo._2))
+      into ((userInfo, id) => UserInfo(id, userInfo._1, userInfo._2))
     ) += (username, password)
   }
 
-  def list(): Future[Seq[User]] = db.run {
+  def list(): Future[Seq[UserInfo]] = db.run {
     users.result
   }
 
@@ -40,7 +47,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     users.filter(_.id === id).exists.result
   }
 
-  def find(id: Long): Future[Option[User]] = db.run {
+  def find(id: Long): Future[Option[UserInfo]] = db.run {
     users.filter(_.id === id).result.headOption
   }
 
@@ -49,7 +56,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   }
 
   def update(id: Long, username: String, password: String) = db.run {
-    val updatedUser = User(id, username, password)
+    val updatedUser = UserInfo(id, username, password)
     users.filter(_.id === id).update(updatedUser)
   }
 
