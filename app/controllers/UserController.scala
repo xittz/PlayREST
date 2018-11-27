@@ -85,5 +85,4 @@ class UserController @Inject()(repo: UserRepository,
       Ok(Json.toJson(usernames))
     }
   }
-
 }

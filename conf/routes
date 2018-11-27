@@ -1,7 +1,3 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
 GET     /users                      controllers.UserController.getUsers
 GET     /users/:id                  controllers.UserController.getUser(id: Long)
 
@@ -11,5 +7,4 @@ DELETE  /user                       controllers.UserController.deleteUser(id: Lo
 
 GET     /usernames                  controllers.UserController.getUsernames
 
-# Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
