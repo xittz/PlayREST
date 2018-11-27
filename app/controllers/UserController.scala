@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import models._
-import dao._
+import daos._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._

@@ -1,4 +1,4 @@
-package dao
+package daos
 
 import models._
 import javax.inject.{ Inject, Singleton }
