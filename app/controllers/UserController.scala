@@ -14,76 +14,52 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CreateUserForm(username: String, password: String)
-
-class UserController @Inject()(repo: UserRepository,
+class UserController @Inject()(service: UserService,
                                   cc: MessagesControllerComponents
                                 )(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
 
-  val userForm: Form[CreateUserForm] = Form {
-    mapping(
-      "username" -> nonEmptyText,
-      "password" -> nonEmptyText
-    )(CreateUserForm.apply)(CreateUserForm.unapply)
+
+  def addUser = Action.async(parse.json[User]) { implicit request =>
+    service.create(request.body).map { _ =>
+      Created("User " + request.body.username + " is created")
+    }
   }
 
-  def addUser = Action.async { implicit request =>
-    userForm.bindFromRequest.fold(
-      errorForm => {
-        Future.successful(BadRequest("error parsing body"))
-      },
-      user => {
-        repo.create(user.username, user.password).map { _ =>
-          Created("User " + user.username + " is created")
-        }
+  def updateUser(id: Long) = Action.async(parse.json[User]) { implicit request =>
+    service.find(id).map {
+      case None => NotFound("user with id = " + id + " is not found")
+      case Some(user) => {
+        service.update(id, request.body)
+        Ok("updated user with id = " + id)
       }
-    )
-  }
-
-  def updateUser(id: Long) = Action.async { implicit request =>
-    userForm.bindFromRequest.fold(
-      errorForm => {
-        Future.successful(BadRequest("error parsing body"))
-      },
-      user => {
-        repo.exists(id).map { exists =>
-          if (exists) {
-            repo.update(id, user.username, user.password)
-            Ok("updated user with id = " + id)
-          } else {
-            NotFound("user with id = " + id + " is not found")
-          }
-        }
-      }
-    )
+    }
   }
 
   def deleteUser(id: Long) = Action.async { implicit request =>
-    repo.exists(id).map { exists => 
-      if (exists) {
-        repo.delete(id)
+    service.find(id).map {
+      case None => NotFound("user with id = " + id + " is not found")
+      case Some(_) => {
+        service.delete(id)
         Ok("user with id = " + id + " is deleted")
-      } else {
-        NotFound("user with id = " + id + " is not found")
       }
     }
   }
 
   def getUsers = Action.async { implicit request =>
-    repo.list().map { users =>
+    service.list().map { users =>
       Ok(Json.toJson(users))
     }
   }
 
   def getUser(id: Long) = Action.async { implicit request =>
-    repo.find(id).map { users =>
+    service.find(id).map { users =>
       Ok(Json.toJson(users))
     }
   }
 
   def getUsernames = Action.async { implicit request => 
-    repo.usernames().map { usernames => 
+    service.usernames().map { usernames => 
       Ok(Json.toJson(usernames))
     }
   }

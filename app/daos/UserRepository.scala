@@ -17,24 +17,25 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   import dbConfig._
   import profile.api._
 
-  private class UserTable(tag: Tag) extends Table[UserInfo](tag, "users") {
+  private class UserTable(tag: Tag) extends Table[User](tag, "users") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def username = column[String]("username")
     def password = column[String]("password")
+    def isDeleted = column[Boolean]("isDeleted")
 
-    def * = (id, username, password) <> ((UserInfo.apply _).tupled, UserInfo.unapply)
+    def * = (id, username, password, isDeleted) <> ((User.apply _).tupled, User.unapply)
   }
 
   private val users = TableQuery[UserTable]
  
-  def create(username: String, password: String): Future[UserInfo] = db.run {
-    (users.map(u => (u.username, u.password))
+  def create(user: User): Future[User] = db.run {
+    (users.map(u => (u.username, u.password, u.isDeleted))
       returning users.map(_.id)
-      into ((userInfo, id) => UserInfo(id, userInfo._1, userInfo._2))
-    ) += (username, password)
+      into ((userInfo, id) => User(0, userInfo._1, userInfo._2, userInfo._3))
+    ) += (user.username, user.password, user.isDeleted)
   }
 
-  def list(): Future[Seq[UserInfo]] = db.run {
+  def list(): Future[Seq[User]] = db.run {
     users.result
   }
 
@@ -42,17 +43,17 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     users.filter(_.id === id).exists.result
   }
 
-  def find(id: Long): Future[Option[UserInfo]] = db.run {
+  def find(id: Long): Future[Option[User]] = db.run {
     users.filter(_.id === id).result.headOption
   }
 
   def delete(id: Long) = db.run {
-    users.filter(_.id === id).delete
+    users.filter(_.id === id).map(_.isDeleted).update(true)
   }
 
-  def update(id: Long, username: String, password: String) = db.run {
-    val updatedUser = UserInfo(id, username, password)
-    users.filter(_.id === id).update(updatedUser)
+  def update(id: Long, user: User) = db.run {
+    val newUser = User(id, user.username, user.password, user.isDeleted)
+    users.filter(_.id === id).update(newUser)
   }
 
   def usernames(): Future[Seq[String]] = db.run {

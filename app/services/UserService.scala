@@ -9,7 +9,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 @Singleton
 class UserService @Inject() (repo: UserRepository) (implicit ec: ExecutionContext) {
   
-  def create(username: String, password: String) = repo.create(username, password)
+  def create(user: User) = repo.create(user)
 
   def list() = repo.list
 
@@ -19,7 +19,7 @@ class UserService @Inject() (repo: UserRepository) (implicit ec: ExecutionContex
 
   def delete(id: Long) = repo.delete(id)
 
-  def update(id: Long, username: String, password: String) = repo.update(id, username, password)
+  def update(id: Long, user: User) = repo.update(id, user)
 
   def usernames() = repo.usernames
 }
