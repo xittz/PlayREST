@@ -14,19 +14,27 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserController @Inject()(service: UserService,
-                                  cc: MessagesControllerComponents
-                                )(implicit ec: ExecutionContext)
+class UserController @Inject()(
+  service: UserService,
+  authAction: UserAuthAction,
+  cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
 
+  /*def authRequired[A](action: Action[A]) = Action.async(action.parser) { request => 
+    request.headers.get("authToken").collect {
+      case "123123" => action(request)
+    } getOrElse {
+      Future.successful(Forbidden("auth token is required"))
+    }
+  }*/
 
-  def addUser = Action.async(parse.json[User]) { implicit request =>
-    service.create(request.body).map { _ =>
-      Created("User " + request.body.username + " is created")
+  def addUser = authAction.async { implicit request => 
+    service.create(request.body).map { _ => 
+      Created("user " + request.body.username + " is created")
     }
   }
 
-  def updateUser(id: Long) = Action.async(parse.json[User]) { implicit request =>
+  def updateUser(id: Long) = authAction.async { implicit request =>
     service.find(id).map {
       case None => NotFound("user with id = " + id + " is not found")
       case Some(user) => {
@@ -36,7 +44,7 @@ class UserController @Inject()(service: UserService,
     }
   }
 
-  def deleteUser(id: Long) = Action.async { implicit request =>
+  def deleteUser(id: Long) = authAction.async { implicit request =>
     service.find(id).map {
       case None => NotFound("user with id = " + id + " is not found")
       case Some(_) => {
@@ -46,19 +54,19 @@ class UserController @Inject()(service: UserService,
     }
   }
 
-  def getUsers = Action.async { implicit request =>
+  def getUsers = authAction.async { implicit request =>
     service.list().map { users =>
       Ok(Json.toJson(users))
     }
   }
 
-  def getUser(id: Long) = Action.async { implicit request =>
+  def getUser(id: Long) = authAction.async { implicit request =>
     service.find(id).map { users =>
       Ok(Json.toJson(users))
     }
   }
 
-  def getUsernames = Action.async { implicit request => 
+  def getUsernames = authAction.async { implicit request => 
     service.usernames().map { usernames => 
       Ok(Json.toJson(usernames))
     }
