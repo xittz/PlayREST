@@ -13,3 +13,4 @@ object User {
     (JsPath \ "password").read[String]
   )(User.apply _)
 }
+

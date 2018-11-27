@@ -16,11 +16,6 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   import dbConfig._
   import profile.api._
-  
-  case class UserInfo(id: Long, username: String, password: String)
-  object UserInfo {
-    implicit val userInfoFormat = Json.format[UserInfo]
-  }
 
   private class UserTable(tag: Tag) extends Table[UserInfo](tag, "users") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
