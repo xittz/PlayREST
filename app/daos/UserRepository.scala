@@ -40,8 +40,8 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     users.filter(_.id === id).exists.result
   }
 
-  def find(id: Long): Future[Seq[User]] = db.run {
-    users.filter(_.id === id).result
+  def find(id: Long): Future[Option[User]] = db.run {
+    users.filter(_.id === id).result.headOption
   }
 
   def delete(id: Long) = db.run {

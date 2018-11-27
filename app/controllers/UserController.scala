@@ -77,7 +77,7 @@ class UserController @Inject()(repo: UserRepository,
 
   def getUser(id: Long) = Action.async { implicit request =>
     repo.find(id).map { users =>
-      Ok(Json.toJson(users(0)))
+      Ok(Json.toJson(users))
     }
   }
 
