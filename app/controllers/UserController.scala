@@ -5,6 +5,7 @@ import javax.inject._
 import services._
 import models._
 import daos._
+import actions._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -20,13 +21,22 @@ class UserController @Inject()(
   cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
 
-  /*def authRequired[A](action: Action[A]) = Action.async(action.parser) { request => 
-    request.headers.get("authToken").collect {
-      case "123123" => action(request)
-    } getOrElse {
-      Future.successful(Forbidden("auth token is required"))
+  def ItemAction(id: Long)(implicit ec: ExecutionContext) = new ActionRefiner[Request, UserRequest] {
+    def executionContext = ec
+    def refine[A](input: Request[A]) = {
+      service.find(id).map {
+        case None => Left(NotFound)
+        case Some(user) => Right(new UserRequest(user, input))
+      }
     }
-  }*/
+  }
+
+  def CheckIfDeletedAction(implicit ec: ExecutionContext) = new ActionFilter[UserRequest] {
+    def executionContext = ec
+    def filter[A](input: UserRequest[A]) = Future.successful {
+      if (input.user.isDeleted) Some(NotFound) else None
+    }
+  }
 
   def addUser = authAction.async { implicit request => 
     service.create(request.body).map { _ => 
@@ -34,39 +44,29 @@ class UserController @Inject()(
     }
   }
 
-  def updateUser(id: Long) = authAction.async { implicit request =>
-    service.find(id).map {
-      case None => NotFound("user with id = " + id + " is not found")
-      case Some(user) => {
-        service.update(id, request.body)
-        Ok("updated user with id = " + id)
-      }
+  def updateUser(id: Long) = (authAction andThen ItemAction(id)).async { implicit request =>
+    service.update(id, request.body).map { _ => 
+      Ok("user with id = " + request.user.id + " is updated ")
     }
   }
 
-  def deleteUser(id: Long) = authAction.async { implicit request =>
-    service.find(id).map {
-      case None => NotFound("user with id = " + id + " is not found")
-      case Some(_) => {
-        service.delete(id)
-        Ok("user with id = " + id + " is deleted")
-      }
+  def deleteUser(id: Long) = (authAction andThen ItemAction(id) andThen CheckIfDeletedAction).async { implicit request =>
+    service.delete(id).map { _ => 
+      Ok("user with id = " + id + " is deleted")
     }
   }
 
-  def getUsers = authAction.async { implicit request =>
+  def getUsers = authAction.async(parse.raw) { implicit request =>
     service.list().map { users =>
       Ok(Json.toJson(users))
     }
   }
 
-  def getUser(id: Long) = authAction.async { implicit request =>
-    service.find(id).map { users =>
-      Ok(Json.toJson(users))
-    }
+  def getUser(id: Long) = (authAction andThen ItemAction(id))(parse.raw) { implicit request =>
+    Ok(Json.toJson(request.user))
   }
 
-  def getUsernames = authAction.async { implicit request => 
+  def getUsernames = authAction.async(parse.raw) { implicit request => 
     service.usernames().map { usernames => 
       Ok(Json.toJson(usernames))
     }

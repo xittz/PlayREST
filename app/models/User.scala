@@ -18,7 +18,7 @@ object User {
 
   implicit val userWrites: Writes[User] = (
     (JsPath \ "id").write[Long] and
-    (JsPath \ "user").write[String] and
+    (JsPath \ "username").write[String] and
     (JsPath \ "password").write[String] and
     (JsPath \ "isDeleted").write[Boolean]
   )(unlift(User.unapply))
