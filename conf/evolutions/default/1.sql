@@ -9,6 +9,7 @@ create table "users" (
 
 insert into "users" ("username", "password", "isDeleted") values ('xittz', '1234', 0);
 insert into "users" ("username", "password", "isDeleted") values ('admin', 'weqweq', 0);
+insert into "users" ("username", "password", "isDeleted") values ('iwbbtt', 'weq4234234', 0);
 
 # --- !Downs
 
