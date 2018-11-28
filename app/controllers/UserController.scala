@@ -16,7 +16,7 @@ class UserController @Inject()(
   service: UserService,
   authAction: UserAuthAction,
   cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
-  extends MessagesAbstractController(cc) with UserActions {
+  extends MessagesAbstractController(cc){
 
   def UserAction(id: Long)(implicit ec: ExecutionContext) = new ActionRefiner[Request, UserRequest] {
     def executionContext = ec
@@ -80,8 +80,4 @@ class UserController @Inject()(
       Ok(Json.toJson(usernames))
     }
   }
-}
-
-trait UserActions {
-  
 }
