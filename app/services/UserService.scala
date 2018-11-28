@@ -3,13 +3,17 @@ package services
 import models._
 import daos._
 import javax.inject.{ Inject, Singleton }
+import play.api.Logger
 
 import scala.concurrent.{ Future, ExecutionContext }
 
 @Singleton
 class UserService @Inject() (repo: UserRepository) (implicit ec: ExecutionContext) {
   
-  def create(user: User) = repo.create(user)
+  def create(user: User) = {
+    Logger.debug("Creating new user, " + user.username)  
+    repo.create(user)
+  }
 
   def list() = repo.list
 

@@ -8,6 +8,8 @@ import actions._
 import play.api.libs.json.Json
 import play.api.mvc._
 
+import play.api.Logger
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(
@@ -20,8 +22,14 @@ class UserController @Inject()(
     def executionContext = ec
     def refine[A](input: Request[A]) = {
       service.find(id).map {
-        case None => Left(NotFound)
-        case Some(user) => Right(new UserRequest(user, input))
+        case None => {
+          Logger.info("Attempt to access a user with invalid id")
+          Left(NotFound)
+        }
+        case Some(user) => {
+          Logger.info("Accessed user with id = " + user.id)
+          Right(new UserRequest(user, input))
+        }
       }
     }
   }
@@ -29,7 +37,12 @@ class UserController @Inject()(
   def CheckIfDeletedAction(implicit ec: ExecutionContext) = new ActionFilter[UserRequest] {
     def executionContext = ec
     def filter[A](input: UserRequest[A]) = Future.successful {
-      if (input.user.isDeleted) Some(NotFound) else None
+      if (input.user.isDeleted) {
+        Logger.info("Attempt to access a deleted user")
+        Some(NotFound)
+      } else {
+        None
+      }
     }
   }
 
@@ -45,7 +58,8 @@ class UserController @Inject()(
     }
   }
 
-  def deleteUser(id: Long) = (authAction andThen ItemAction(id) andThen CheckIfDeletedAction).async { implicit request =>
+  def deleteUser(id: Long) = (authAction andThen ItemAction(id) andThen 
+    CheckIfDeletedAction).async(parse.raw) { implicit request =>
     service.delete(id).map { _ => 
       Ok("user with id = " + id + " is deleted")
     }

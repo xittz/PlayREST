@@ -29,10 +29,9 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   private val users = TableQuery[UserTable]
  
   def create(user: User): Future[User] = db.run {
-    (users.map(u => (u.username, u.password, u.isDeleted))
-      returning users.map(_.id)
-      into ((userInfo, id) => User(0, userInfo._1, userInfo._2, userInfo._3))
-    ) += (user.username, user.password, user.isDeleted)
+    (users returning users.map(_.id)
+      into ((user, id) => user.copy(id = id))
+    ) += user
   }
 
   def list(): Future[Seq[User]] = db.run {

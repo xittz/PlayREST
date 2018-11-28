@@ -3,6 +3,7 @@ package actions
 import models._
 import javax.inject.{ Inject, Singleton }
 import play.api.mvc._
+import play.api.Logger
 import scala.concurrent.{ ExecutionContext, Future }
 
 
@@ -13,8 +14,12 @@ class UserAuthAction @Inject() (implicit val ec: ExecutionContext, playBodyParse
 
   override def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]): Future[Result] = {
     request.headers.get("authToken").collect {
-      case "123123" => block(request)
+      case "123123" => {
+        Logger.info("Connection with valid auth token")
+        block(request)
+      }
     } getOrElse {
+      Logger.warn("Connection without an auth token")
       Future.successful(Forbidden("auth token is required"))
     }
   }
