@@ -5,7 +5,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.data.validation._
 
-case class User(id: Long = 0, username: String, password: String, isDeleted: Boolean = false)
+case class User(id: Long = 0, username: String, password: String, is_deleted: Boolean = false)
 
 object User {  
 
@@ -20,7 +20,7 @@ object User {
       "id" -> u.id,
       "username" -> u.username,
       "password" -> u.password,
-      "isDeleted" -> u.isDeleted
+      "is_deleted" -> u.is_deleted
   )
 }
 

@@ -41,7 +41,7 @@ class UserController @Inject()(
   def CheckIfDeletedAction(implicit ec: ExecutionContext) = new ActionFilter[UserRequest] {
     def executionContext = ec
     def filter[A](input: UserRequest[A]) = Future.successful {
-      if (input.user.isDeleted) {
+      if (input.user.is_deleted) {
         Logger.info("Attempt to access a deleted user")
         Some(NotFound)
       } else {

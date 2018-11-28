@@ -21,9 +21,9 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def username = column[String]("username")
     def password = column[String]("password")
-    def isDeleted = column[Boolean]("isDeleted")
+    def is_deleted = column[Boolean]("is_deleted")
 
-    def * = (id, username, password, isDeleted) <> ((User.apply _).tupled, User.unapply)
+    def * = (id, username, password, is_deleted) <> ((User.apply _).tupled, User.unapply)
   }
 
   private val users = TableQuery[UserTable]
@@ -47,7 +47,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   }
 
   def delete(id: Long) = db.run {
-    users.filter(_.id === id).map(_.isDeleted).update(true)
+    users.filter(_.id === id).map(_.is_deleted).update(true)
   }
 
   def update(id: Long, user: User) = db.run {
