@@ -16,9 +16,9 @@ class UserController @Inject()(
   service: UserService,
   authAction: UserAuthAction,
   cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
-  extends MessagesAbstractController(cc) {
+  extends MessagesAbstractController(cc) with UserActions {
 
-  def ItemAction(id: Long)(implicit ec: ExecutionContext) = new ActionRefiner[Request, UserRequest] {
+  def UserAction(id: Long)(implicit ec: ExecutionContext) = new ActionRefiner[Request, UserRequest] {
     def executionContext = ec
     def refine[A](input: Request[A]) = {
       service.find(id).map {
@@ -52,13 +52,13 @@ class UserController @Inject()(
     }
   }
 
-  def updateUser(id: Long) = (authAction andThen ItemAction(id)).async { implicit request =>
+  def updateUser(id: Long) = (authAction andThen UserAction(id)).async { implicit request =>
     service.update(id, request.body).map { _ => 
       Ok("user with id = " + request.user.id + " is updated ")
     }
   }
 
-  def deleteUser(id: Long) = (authAction andThen ItemAction(id) andThen 
+  def deleteUser(id: Long) = (authAction andThen UserAction(id) andThen 
     CheckIfDeletedAction).async(parse.raw) { implicit request =>
     service.delete(id).map { _ => 
       Ok("user with id = " + id + " is deleted")
@@ -71,7 +71,7 @@ class UserController @Inject()(
     }
   }
 
-  def getUser(id: Long) = (authAction andThen ItemAction(id))(parse.raw) { implicit request =>
+  def getUser(id: Long) = (authAction andThen UserAction(id))(parse.raw) { implicit request =>
     Ok(Json.toJson(request.user))
   }
 
@@ -80,4 +80,8 @@ class UserController @Inject()(
       Ok(Json.toJson(usernames))
     }
   }
+}
+
+trait UserActions {
+  
 }
