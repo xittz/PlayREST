@@ -2,11 +2,15 @@ package controllers
 
 import javax.inject._
 
+import filters._
 import services._
 import models._
 import actions._
 import play.api.libs.json.Json
 import play.api.mvc._
+
+import play.api.http.DefaultHttpFilters
+import play.api.http.EnabledFilters
 
 import play.api.Logger
 
@@ -16,7 +20,7 @@ class UserController @Inject()(
   service: UserService,
   authAction: UserAuthAction,
   cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
-  extends MessagesAbstractController(cc){
+  extends MessagesAbstractController(cc) {
 
   def UserAction(id: Long)(implicit ec: ExecutionContext) = new ActionRefiner[Request, UserRequest] {
     def executionContext = ec
