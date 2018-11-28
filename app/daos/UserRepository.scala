@@ -52,7 +52,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   }
 
   def update(id: Long, user: User) = db.run {
-    val newUser = User(id, user.username, user.password, user.isDeleted)
+    val newUser = user.copy(id = id)
     users.filter(_.id === id).update(newUser)
   }
 
