@@ -12,7 +12,7 @@ object User {
   implicit val userReads: Reads[User] = (
     Reads.pure(0: Long) and
     (__ \ "username").read[String] and
-    (__ \ "password").read[String](minLength[String](6)) and
+    (__ \ "password").read[String]((minLength[String](6)) keepAnd maxLength[String](8))and
     Reads.pure(false: Boolean)
   )(User.apply _)
 
