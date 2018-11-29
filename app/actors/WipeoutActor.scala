@@ -9,7 +9,6 @@ import services._
 
 @Singleton
 class WipeoutActor @Inject() (service: UserService)(implicit ec: ExecutionContext) extends Actor {
-  var c= 0
   override def receive: Receive = {
       case "wipeout" => {
         service.deleteAll
