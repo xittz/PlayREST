@@ -50,6 +50,10 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     users.filter(_.id === id).map(_.is_deleted).update(true)
   }
 
+  def deleteAll() = db.run {
+    users.map(_.is_deleted).update(true)
+  }
+
   def update(id: Long, user: User) = db.run {
     val newUser = user.copy(id = id)
     users.filter(_.id === id).update(newUser)

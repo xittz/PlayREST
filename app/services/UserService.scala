@@ -23,6 +23,8 @@ class UserService @Inject() (repo: UserRepository) (implicit ec: ExecutionContex
 
   def delete(id: Long) = repo.delete(id)
 
+  def deleteAll() = repo.deleteAll
+
   def update(id: Long, user: User) = repo.update(id, user)
 
   def usernames() = repo.usernames
