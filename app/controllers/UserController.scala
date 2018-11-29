@@ -19,8 +19,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(
   service: UserService,
   authAction: UserAuthAction,
-  cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
-  extends MessagesAbstractController(cc) {
+  )(implicit ec: ExecutionContext)
+  extends Controller {
 
   def UserAction(id: Long)(implicit ec: ExecutionContext) = new ActionRefiner[Request, UserRequest] {
     def executionContext = ec

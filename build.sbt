@@ -14,4 +14,10 @@ libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.197"
 
-libraryDependencies += specs2 % Test
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0" % "test"
+)
+
+libraryDependencies ++= Seq(
+  "org.mockito" % "mockito-core" % "2.21.0" % Test
+)

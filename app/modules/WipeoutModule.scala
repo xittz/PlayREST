@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 import javax.inject.{Inject, Named}
 import scala.concurrent.duration._
 
-class Scheduler @Inject() (val system: ActorSystem, @Named("WipeoutActor") val receiver: ActorRef)
+class WipeoutScheduler @Inject() (val system: ActorSystem, @Named("WipeoutActor") val receiver: ActorRef)
     (implicit ec: ExecutionContext) {
     var actor = system.scheduler.schedule(
         initialDelay = 5.minutes,
@@ -24,6 +24,6 @@ class WipeoutModule extends AbstractModule with AkkaGuiceSupport {
     def configure() = {
         Logger.warn("[ Configurring Scheduler ]")
         bindActor[WipeoutActor]("WipeoutActor")
-        bind(classOf[Scheduler]).asEagerSingleton()
+        bind(classOf[WipeoutScheduler]).asEagerSingleton()
     }
 }
