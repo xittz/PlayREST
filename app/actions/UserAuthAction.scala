@@ -6,7 +6,6 @@ import play.api.mvc._
 import play.api.Logger
 import scala.concurrent.{ ExecutionContext, Future }
 
-
 @Singleton
 class UserAuthAction @Inject() (implicit val ec: ExecutionContext, playBodyParsers: PlayBodyParsers) extends ActionBuilder[Request, User] with Results {
   override def parser = playBodyParsers.json[User]

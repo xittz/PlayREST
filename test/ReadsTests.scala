@@ -1,5 +1,3 @@
-import collection.mutable.Stack
-import org.scalatest._
 import models._
 
 import play.api.libs.json._
@@ -8,15 +6,22 @@ import play.api.libs.functional.syntax._
 import play.api.data.validation._
 
 import org.scalatest._
-import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play._
 
-import org.mockito.Mockito._
 
 class ReadsSpec extends FlatSpec with Matchers {
 
     "User reads" should "parse a valid json" in {
         val userJson = Json.obj("username" -> "andrew", "password" -> "123456")
+        val user = userJson.as[User]
+        assert(user.id == 0)
+        assert(user.username == "andrew")
+        assert(user.password == "123456")
+        assert(user.is_deleted == false)
+    }
+
+    "User reads" should "parse a valid json with extra fields" in {
+        val userJson = Json.obj("username" -> "andrew", "age" -> 20, "password" -> "123456")
         val user = userJson.as[User]
         assert(user.id == 0)
         assert(user.username == "andrew")
